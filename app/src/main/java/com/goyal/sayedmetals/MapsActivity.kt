@@ -1,43 +1,81 @@
 package com.goyal.sayedmetals
 
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
 import android.os.Bundle
-
+import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.snackbar.Snackbar
+import com.goyal.sayedmetals.R.string
+import com.goyal.sayedmetals.arch.BaseActivity
+import com.goyal.sayedmetals.model.schema.LocationData
+import com.goyal.sayedmetals.viewmodel.MapsViewModel
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : BaseActivity(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
+  private lateinit var mMap: GoogleMap
+  private lateinit var viewModel: MapsViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_maps)
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_maps)
+    initComponents()
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    viewModel.cancelApiCall()
+  }
+
+  private fun initComponents() {
+    val mapFragment = supportFragmentManager
+        .findFragmentById(R.id.map) as SupportMapFragment
+    mapFragment.getMapAsync(this)
+    viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
+    viewModel.setRepository(compRoot()!!.getMarkerRepository())
+    startObserving()
+  }
+
+  private fun startObserving() {
+    viewModel.liveDataMarkerList.observe(this, Observer {
+      if (it != null) {
+        addMarkers(it)
+      } else {
+        Toast.makeText(this, getString(string.err_marker), Toast.LENGTH_SHORT)
+            .show()
+      }
+    })
+    viewModel.liveDataErrorMessage.observe(this, Observer {
+      if (it != null) {
+        Snackbar.make(findViewById(android.R.id.content), it, Snackbar.LENGTH_LONG)
+            .setActionTextColor(Color.RED)
+            .show()
+      }
+    })
+  }
+
+  override fun onMapReady(googleMap: GoogleMap) {
+    mMap = googleMap
+    mMap.uiSettings.isZoomControlsEnabled = true
+    mMap.uiSettings.isScrollGesturesEnabled = true
+    mMap.uiSettings.isTiltGesturesEnabled = true
+  }
+
+  private fun addMarkers(markersList: List<LocationData>) {
+    for (marker in markersList) {
+      val latLng = LatLng(marker.latitude.toDouble(), marker.longitude.toDouble())
+      mMap.addMarker(
+          MarkerOptions().position(latLng)
+              .title(marker.name)
+      )
+      mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng))
     }
+  }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-    }
 }

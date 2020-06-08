@@ -1,5 +1,6 @@
 package com.goyal.sayedmetals.model.repository
 
+import com.goyal.sayedmetals.Configuration
 import com.goyal.sayedmetals.model.apis.MarkerApi
 import com.goyal.sayedmetals.model.schema.LocationData
 import com.goyal.sayedmetals.model.schema.MarkerSchema
@@ -16,7 +17,8 @@ class MarkerRepository(private val markerApi: MarkerApi) {
     this.markerApiListener = markerApiListener
   }
 
-  fun fetchMarkerData() {
+  fun fetchMarkerData(searchString: String = "") {
+    markerCall = markerApi.getMarkersDetails(searchString, Configuration.API_KEY)
     markerCall.enqueue(object : Callback<MarkerSchema> {
       override fun onResponse(call: Call<MarkerSchema>, response: Response<MarkerSchema>) {
         if (response.code() == 200) {
@@ -38,7 +40,7 @@ class MarkerRepository(private val markerApi: MarkerApi) {
   }
 
   interface MarkerApiListener {
-    fun onMarkerResponseSuccess(horizontalList: List<LocationData>)
+    fun onMarkerResponseSuccess(markerList: List<LocationData>)
 
     fun onMarkerResponseFailure(message: String)
   }
