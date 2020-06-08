@@ -1,35 +1,63 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
-    defaultConfig {
-        applicationId "com.goyal.sayedmetals"
-        minSdkVersion 21
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  compileSdkVersion 29
+  buildToolsVersion "29.0.2"
+  defaultConfig {
+    applicationId "com.goyal.sayedmetals"
+    minSdkVersion 21
+    targetSdkVersion 29
+    versionCode 1
+    versionName "1.0"
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
+  }
+  dataBinding {
+    enabled = true
+  }
+}
+
+repositories {
+  maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.0.2'
-    implementation 'com.google.android.gms:play-services-maps:16.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  //ui
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  implementation "androidx.appcompat:appcompat:$appcompat_version"
+  implementation "androidx.core:core-ktx:$ktx_version"
+  implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
+  implementation "com.google.android.material:material:$material_version"
+  //Data Binding
+  kapt "com.android.databinding:compiler:$databinding_version"
+  //Lifecycle
+  implementation "androidx.legacy:legacy-support-v4:$legacy_support_version"
+  implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_livedata"
+  implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+  implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+  kapt "android.arch.lifecycle:compiler:$lifecycle_version"
+  //Retrofit
+  implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+  implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
+  //Moshi
+  implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
+  kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi_version"
+  //OkHttp3
+  implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+  implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_logging_version"
+  //maps
+  implementation "com.google.android.gms:play-services-maps:$maps_version"
+  //testing
+  testImplementation 'junit:junit:4.12'
+  androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+  androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
