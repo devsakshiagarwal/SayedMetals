@@ -14,7 +14,10 @@ class MapsViewModel : ViewModel(), MarkerRepository.MarkerApiListener {
   fun setRepository(markerRepository: MarkerRepository) {
     this.markerRepository = markerRepository
     markerRepository.setMarkerApiListener(this)
-    markerRepository.fetchMarkerData("steel")
+  }
+
+  fun fetchMarketData(search: String = "iron") {
+    markerRepository.fetchMarkerData(search)
   }
 
   fun cancelApiCall() {
