@@ -2,5 +2,4 @@
     <string name="app_name">SayedMetals</string>
     <string name="title_activity_maps">Map</string>
     <string name="err_marker">No Data available for this search.</string>
-
 </resources>
